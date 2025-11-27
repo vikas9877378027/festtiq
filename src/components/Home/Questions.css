@@ -1,0 +1,146 @@
+/* ---------- Container ---------- */
+.faq-section {
+  max-width: 1440px;
+  padding: 0 96px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+/* ---------- Heading ---------- */
+.faq-heading {
+  max-width: 850px;
+  text-align: center;
+  margin: 0 auto 40px;
+}
+
+.faq-title {
+  font-family: "Abhaya Libre", serif;
+  font-weight: 400;
+  font-size: 48px;
+  line-height: 117%;
+  letter-spacing: -1.5px;
+  color: #211C6A;
+  margin: 0 0 12px 0;
+}
+
+.faq-subtitle {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 160%;
+  letter-spacing: 0.15px;
+  color: #444;
+  margin: 0;
+}
+
+/* ---------- List ---------- */
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ---------- Item ---------- */
+.faq-item {
+  border: 2px solid #ba29a4;
+  border-radius: 14px;
+  padding: 20px;
+  background: #fff;
+  transition: background 0.3s ease;
+  cursor: pointer;
+}
+
+.faq-item.open {
+  background: #f3e5f5;
+}
+
+/* ---------- Header ---------- */
+.faq-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  row-gap: 8px;
+}
+
+.faq-number {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-weight: 500;
+  font-size: 18px;
+  margin-right: 16px;
+}
+
+.faq-question {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  flex: 1;
+}
+
+/* ---------- Toggle button ---------- */
+.faq-toggle {
+  border: none;
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.25s ease;
+}
+
+/* ---------- Answer ---------- */
+.faq-answer {
+  margin-top: 12px;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #333;
+  transition: all 0.3s ease;
+}
+
+
+/* Hide scrollbar for WebKit browsers */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge, Firefox */
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+
+
+/* ---------- Responsive (≤768 px) ---------- */
+@media (max-width: 768px) {
+  .faq-section {
+    padding: 0 20px;
+  }
+
+  .faq-title {
+    font-size: 28px;
+    line-height: 120%;
+    letter-spacing: -1px;
+  }
+
+  .faq-subtitle {
+    font-size: 14px;
+    line-height: 150%;
+    letter-spacing: 0.1px;
+  }
+
+  .faq-item {
+    padding: 16px;
+  }
+
+  .faq-number,
+  .faq-question {
+    font-size: 16px;
+  }
+}
