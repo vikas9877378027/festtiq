@@ -8,10 +8,11 @@ import { toast } from "react-toastify";
 import fallbackImg from "../../../assets/venue/image (11).png";
 import VenueHighlight from "./VenueHighlight";
 import Rating from "./Rating";
-
-const API_BASE = "http://localhost:4000/api";
-const FAVORITES_URL = `${API_BASE}/user/favorites`;
-const TOGGLE_FAVORITE_URL = `${API_BASE}/user/favorites/toggle`;
+import {
+  FAVORITES_URL,
+  TOGGLE_FAVORITE_URL,
+  API_ENDPOINTS,
+} from "../../../config/apiConfig";
 
 const SingleVenue = () => {
   const { id } = useParams();
@@ -29,7 +30,7 @@ const SingleVenue = () => {
     const fetchVenue = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`${API_BASE}/product/${id}`);
+        const response = await fetch(API_ENDPOINTS.product.getById(id));
         const data = await response.json();
         
         if (response.ok && data?.success && data?.product) {

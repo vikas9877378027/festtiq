@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { Auth0Provider } from '@auth0/auth0-react';
 import { auth0Config } from './auth0-config.js';
 import { ToastContainer } from 'react-toastify';
@@ -31,17 +31,23 @@ import GalleryAdmin from "./pages/admin/GalleryAdmin";
 import ServicesAdmin from "./pages/admin/ServicesAdmin";
 import UsersAdmin from "./pages/admin/UsersAdmin";
 import BookingsAdmin from "./pages/admin/BookingsAdmin";
-function App() {
-  const [showModal, setShowModal] = useState(false);
+import VendorLayout from "./pages/vendor/VendorLayout";
+import VendorLogin from "./pages/vendor/VendorLogin";
+import VendorDashboard from "./pages/vendor/VendorDashboard";
+import VendorBookings from "./pages/vendor/VendorBookings";
+
+// Layout wrapper component to conditionally show Navbar/Footer
+function AppLayout({ children, showModal, setShowModal }) {
+  const location = useLocation();
+  
+  // Hide Navbar and Footer on admin and vendor routes
+  const isAdminRoute = location.pathname.startsWith('/admin');
+  const isVendorRoute = location.pathname.startsWith('/vendor');
+  const hideNavAndFooter = isAdminRoute || isVendorRoute;
 
   return (
-    <Auth0Provider
-      domain={auth0Config.domain}
-      clientId={auth0Config.clientId}
-      authorizationParams={auth0Config.authorizationParams}
-    >
-      <BrowserRouter>
-        <Navbar onGetStartedClick={() => setShowModal(true)} />
+    <>
+      {!hideNavAndFooter && <Navbar onGetStartedClick={() => setShowModal(true)} />}
       
       {/* Toast Notification Container */}
       <ToastContainer
@@ -58,7 +64,26 @@ function App() {
         style={{ zIndex: 9999 }}
       />
 
-      <Routes>
+      {children}
+
+      {!hideNavAndFooter && <Footer />}
+      {!hideNavAndFooter && <LoginModal show={showModal} onClose={() => setShowModal(false)} />}
+    </>
+  );
+}
+
+function App() {
+  const [showModal, setShowModal] = useState(false);
+
+  return (
+    <Auth0Provider
+      domain={auth0Config.domain}
+      clientId={auth0Config.clientId}
+      authorizationParams={auth0Config.authorizationParams}
+    >
+      <BrowserRouter>
+        <AppLayout showModal={showModal} setShowModal={setShowModal}>
+          <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/services" element={<Services />} />
         <Route path="/services/booking" element={<ServiceBookingForm />} />
@@ -87,10 +112,15 @@ function App() {
           <Route path="users" element={<UsersAdmin />} />
           <Route path="bookings" element={<BookingsAdmin />} />
         </Route>
+        {/* Vendor Routes */}
+        <Route path="/vendor/login" element={<VendorLogin />} />
+        <Route path="/vendor" element={<VendorLayout />}>
+          <Route index element={<VendorDashboard />} />
+          <Route path="dashboard" element={<VendorDashboard />} />
+          <Route path="bookings" element={<VendorBookings />} />
+        </Route>
       </Routes>
-
-        <Footer />
-        <LoginModal show={showModal} onClose={() => setShowModal(false)} />
+        </AppLayout>
       </BrowserRouter>
     </Auth0Provider>
   );

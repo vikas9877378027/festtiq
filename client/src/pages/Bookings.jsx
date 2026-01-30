@@ -12,9 +12,7 @@ import {
 } from "@phosphor-icons/react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-
-const API_BASE = "http://localhost:4000/api";
-const BOOKING_USER_URL = `${API_BASE}/booking/user`;
+import { BOOKING_USER_URL, getImageUrl } from "../config/apiConfig";
 
 const Bookings = () => {
   const navigate = useNavigate();
@@ -97,7 +95,7 @@ const Bookings = () => {
   // Get venue image
   const getVenueImage = (booking) => {
     if (booking.venueId?.images && booking.venueId.images.length > 0) {
-      return `http://localhost:4000${booking.venueId.images[0]}`;
+      return getImageUrl(booking.venueId.images[0]);
     }
     // Fallback to service image if only services booked
     if (

@@ -1,13 +1,14 @@
 // src/pages/admin/GalleryAdmin.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-
-const API_BASE = "http://localhost:4000/api";
-const GALLERY_ADD_URL = `${API_BASE}/gallery-section/add`;
-const GALLERY_LIST_URL = `${API_BASE}/gallery-section/list`;
-const GALLERY_STATUS_URL = `${API_BASE}/gallery-section/status`;
-const GALLERY_UPDATE_URL = `${API_BASE}/gallery-section/update`;
-const GALLERY_DELETE_URL = `${API_BASE}/gallery-section/delete`;
+import {
+  GALLERY_ADD_URL,
+  GALLERY_LIST_URL,
+  GALLERY_STATUS_URL,
+  GALLERY_UPDATE_URL,
+  GALLERY_DELETE_URL,
+  getImageUrl,
+} from "../../config/apiConfig";
 
 const GalleryAdmin = () => {
   // ============= FORM STATE =============
@@ -387,7 +388,7 @@ const GalleryAdmin = () => {
                     className="relative h-32 overflow-hidden rounded-xl border border-gray-200"
                   >
                     <img
-                      src={`http://localhost:4000${img}`}
+                      src={getImageUrl(img)}
                       alt={`${selectedSection.heading} - ${idx + 1}`}
                       className="h-full w-full object-cover"
                     />

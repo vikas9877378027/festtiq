@@ -3,9 +3,7 @@ import { ArrowUpRight } from "@phosphor-icons/react";
 import axios from "axios";
 
 // Service image removed - using API data
-
-const API_BASE = "http://localhost:4000/api";
-const GALLERY_LIST_URL = `${API_BASE}/gallery-section/list`;
+import { GALLERY_LIST_URL } from "../config/apiConfig";
 
 // Default placeholder if gallery has no images
 const fallbackImage = "https://via.placeholder.com/400x300?text=Gallery+Image";

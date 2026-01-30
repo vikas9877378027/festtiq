@@ -21,9 +21,7 @@ import Question from "../components/Home/Question";
 import EventCover from "../components/Home/EventCover";
 import { useNavigate } from "react-router-dom";
 import { MdArrowOutward } from "react-icons/md";
-
-const API_BASE = "http://localhost:4000/api";
-const VENUE_LIST_URL = `${API_BASE}/product/list`;
+import { VENUE_LIST_URL, API_BASE_URL, getImageUrl } from "../config/apiConfig";
 
 export const eventCategories = [
   {
@@ -151,9 +149,7 @@ export default function Home() {
               const img = venue.image[0]; // Take only first image per venue
               
               // Check if image is already a full URL (Cloudinary) or local path
-              const imageUrl = img.startsWith('http') 
-                ? img  // Use as is if it's already a full URL
-                : `http://localhost:4000${img}`; // Add localhost for local images
+              const imageUrl = getImageUrl(img);
               console.log("🖼️ Adding image:", imageUrl);
               allImages.push(imageUrl);
             }

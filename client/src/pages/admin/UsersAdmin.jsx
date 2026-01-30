@@ -1,9 +1,7 @@
 // src/pages/admin/UsersAdmin.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-
-const API_BASE = "http://localhost:4000/api";
-const USER_LIST_URL = `${API_BASE}/user/list`;
+import { USER_LIST_URL } from "../../config/apiConfig";
 
 const UsersAdmin = () => {
   const [users, setUsers] = useState([]);

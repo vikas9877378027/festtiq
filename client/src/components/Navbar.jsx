@@ -17,20 +17,17 @@ import { FcGoogle } from "react-icons/fc";
 import { FaFacebook, FaApple } from "react-icons/fa";
 import avatar from "../assets/venue/avatar.jpg";
 import logo from "../assets/Logo (1).png";
-
-/* ===== API ENDPOINTS (cookie/session auth) ===== */
-const API_BASE      = "http://localhost:4000/api";
-
-// user
-const USER_REGISTER = `${API_BASE}/user/register`;
-const USER_LOGIN    = `${API_BASE}/user/login`;
-const USER_IS_AUTH  = `${API_BASE}/user/is-auth`;
-const USER_LOGOUT   = `${API_BASE}/user/logout`;
-
-// admin (seller)
-const ADMIN_LOGIN   = `${API_BASE}/seller/login`;
-const ADMIN_IS_AUTH = `${API_BASE}/seller/is-auth`;
-const ADMIN_LOGOUT  = `${API_BASE}/seller/logout`;
+import {
+  API_BASE,
+  USER_REGISTER,
+  USER_LOGIN,
+  USER_IS_AUTH,
+  USER_LOGOUT,
+  ADMIN_LOGIN,
+  ADMIN_IS_AUTH,
+  ADMIN_LOGOUT,
+  API_ENDPOINTS,
+} from "../config/apiConfig";
 
 /* ===========================================
    Auth Modal (email/password, no phone/OTP)
@@ -449,7 +446,7 @@ const Navbar = () => {
           console.log("🔐 Auth0 user detected, syncing with backend...", auth0User);
           
           // Use the OAuth login endpoint
-          const oauthRes = await fetch(`${API_BASE}/user/oauth-login`, {
+          const oauthRes = await fetch(API_ENDPOINTS.user.oauthLogin, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
@@ -520,8 +517,13 @@ const Navbar = () => {
             setUser(u);
             localStorage.setItem("auth_user", JSON.stringify(u));
             
-            // Redirect admin to admin panel if not already there
-            if (!location.pathname.startsWith("/admin")) {
+            // Only redirect to admin panel if on home/public pages, not vendor pages
+            const isVendorPage = location.pathname.startsWith("/vendor");
+            const isAdminPage = location.pathname.startsWith("/admin");
+            const isPublicPage = !isVendorPage && !isAdminPage;
+            
+            // Redirect admin to admin panel ONLY if they're on a public page
+            if (isPublicPage) {
               navigate("/admin");
             }
             return;
@@ -853,8 +855,8 @@ const Navbar = () => {
           // 🔔 tell other components in the same tab
           window.dispatchEvent(new Event("auth-updated"));
           
-          // Redirect admin to admin panel
-          if (user.role === "admin") {
+          // Redirect admin to admin panel ONLY if not on vendor pages
+          if (user.role === "admin" && !location.pathname.startsWith("/vendor")) {
             navigate("/admin");
           }
         }}

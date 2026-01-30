@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { XMarkIcon, EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
-import { useAuth } from '../../context/Auth'
+import { useAuth } from '../../context/Auth';
+import { USER_LOGIN, USER_REGISTER } from '../../config/apiConfig';
 
 export default function AuthModal({ show, onClose }) {
   const { signIn } = useAuth();
@@ -41,7 +42,7 @@ export default function AuthModal({ show, onClose }) {
       setLoading(true);
       setErr("");
 
-      const url = mode === "signin" ? "/api/auth/login" : "/api/auth/register";
+      const url = mode === "signin" ? USER_LOGIN : USER_REGISTER;
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

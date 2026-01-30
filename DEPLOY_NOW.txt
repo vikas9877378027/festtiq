@@ -1,0 +1,146 @@
+================================================================================
+  FESTIQ - Deploy to sumriktest.in
+================================================================================
+
+STEP 1: On Your LOCAL Machine
+------------------------------
+cd c:\Users\Lenovo\Downloads\Festiq-17nov
+
+# Build frontend
+cd client
+npm run build
+
+# Go back to root
+cd ..
+
+
+STEP 2: Upload Files via FTP/FileZilla
+---------------------------------------
+Upload these files to your server:
+
+1. client/dist/*  →  /var/www/html/  (or public_html/)
+   (Upload ALL files from dist folder to root of public_html)
+
+2. .htaccess  →  /var/www/html/.htaccess
+   (The .htaccess must be in the SAME folder as index.html)
+
+3. server/*  →  /home/your-username/backend/
+   (Upload all backend files)
+
+
+STEP 3: On Your SERVER via SSH
+-------------------------------
+ssh your-username@sumriktest.in
+
+# Install backend dependencies
+cd ~/backend
+npm install
+
+# Start backend with PM2
+pm2 start server.js --name festiq-backend
+pm2 save
+
+# Enable Apache proxy (REQUIRED for API to work!)
+sudo a2enmod proxy
+sudo a2enmod proxy_http
+sudo a2enmod rewrite
+sudo systemctl restart apache2
+
+
+STEP 4: Test
+------------
+1. Open browser: https://sumriktest.in
+   ✓ Should load the app
+
+2. Open DevTools (F12) → Console, run:
+   fetch('https://sumriktest.in/api/product/list').then(r=>r.json()).then(console.log)
+   ✓ Should show: {success: true, products: [...]}
+
+3. Navigate to: https://sumriktest.in/venues
+   ✓ Should load venues page
+
+4. Press F5 (hard refresh)
+   ✓ Should still work!
+
+
+STEP 5: If API Returns 404
+---------------------------
+Run these on your SERVER:
+
+# Check if backend is running
+pm2 list
+
+# If not running:
+pm2 start server.js --name festiq-backend
+
+# Check if it responds
+curl http://localhost:4000/api/product/list
+
+# If backend works but API still 404, check Apache logs:
+sudo tail -f /var/log/apache2/error.log
+
+# Most common issue: mod_proxy not enabled
+sudo a2enmod proxy proxy_http
+sudo systemctl restart apache2
+
+
+================================================================================
+  FILE LOCATIONS ON SERVER
+================================================================================
+
+Frontend:  /var/www/html/
+           ├── index.html
+           ├── assets/
+           └── .htaccess  ← MUST be here!
+
+Backend:   /home/your-username/backend/
+           ├── server.js
+           ├── package.json
+           └── .env.production
+
+================================================================================
+  TROUBLESHOOTING
+================================================================================
+
+Problem: API calls return 404
+Solution: Enable mod_proxy (see Step 3 above)
+
+Problem: Hard refresh gives 404
+Solution: Make sure .htaccess is in public_html root
+
+Problem: Backend won't start
+Solution: Check PM2 logs: pm2 logs festiq-backend
+
+Problem: "Not allowed by CORS"
+Solution: Already fixed in server.js - just redeploy backend
+
+================================================================================
+  QUICK COMMANDS
+================================================================================
+
+# Check backend status
+pm2 list
+pm2 logs festiq-backend
+
+# Restart backend
+pm2 restart festiq-backend
+
+# Restart Apache
+sudo systemctl restart apache2
+
+# Test API locally on server
+curl http://localhost:4000/api/product/list
+
+# Test API through Apache proxy
+curl https://sumriktest.in/api/product/list
+
+================================================================================
+
+Your site: https://sumriktest.in
+Backend runs on: localhost:4000 (accessed via proxy)
+
+After deployment, both issues will be fixed:
+✓ API calls will work (no more 404)
+✓ Hard refresh will work (React Router routes)
+
+================================================================================

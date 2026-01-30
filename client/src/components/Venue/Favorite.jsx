@@ -3,11 +3,11 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import eventFallback from "../../assets/venue/image (11).png";
-
-const API_BASE = "http://localhost:4000/api";
-const FAVORITES_URL = `${API_BASE}/user/favorites`;
-const PRODUCT_LIST_URL = `${API_BASE}/product/list`;
-const TOGGLE_FAVORITE_URL = `${API_BASE}/user/favorites/toggle`;
+import {
+  FAVORITES_URL,
+  PRODUCT_LIST_URL,
+  TOGGLE_FAVORITE_URL,
+} from "../../config/apiConfig";
 
 const Favorite = () => {
   const navigate = useNavigate();

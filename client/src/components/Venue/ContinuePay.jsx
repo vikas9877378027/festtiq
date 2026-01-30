@@ -4,12 +4,11 @@ import { ArrowLeft, CreditCard, Bank, Money, QrCode } from "@phosphor-icons/reac
 import axios from "axios";
 import BookingSuccessModal from "./BookingSuccessModal.jsx";
 import { toast } from "react-toastify";
-
-const API_BASE = "http://localhost:4000/api";
-const BOOKING_URL = `${API_BASE}/booking/place`;
+import { BOOKING_URL, getImageUrl } from "../../config/apiConfig";
 
 const ContinuePay = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [bookingData, setBookingData] = useState(null);
   const [paymentOption, setPaymentOption] = useState("partial"); // "partial" or "full"
   const [paymentMethod, setPaymentMethod] = useState("Credit Card");
   const [loading, setLoading] = useState(false);
@@ -154,6 +153,10 @@ const ContinuePay = () => {
       console.log("Response:", response.data);
 
       if (response.data?.success) {
+        setBookingData({
+          orderId: response.data.order?._id,
+          ...bookingData
+        });
         setShowSuccessModal(true);
       } else {
         throw new Error(response.data?.message || "Booking failed");
@@ -350,7 +353,7 @@ const ContinuePay = () => {
             <div className="flex gap-4 items-start">
               {venue.images && venue.images.length > 0 ? (
                 <img
-                  src={`http://localhost:4000${venue.images[0]}`}
+                  src={getImageUrl(venue.images[0])}
                   alt={venue.name}
                   className="rounded-lg w-[60px] h-[60px] object-cover"
                 />
@@ -417,7 +420,11 @@ const ContinuePay = () => {
         </div>
       </div>
       
-      <BookingSuccessModal show={showSuccessModal} onClose={() => setShowSuccessModal(false)} />
+      <BookingSuccessModal 
+        show={showSuccessModal} 
+        onClose={() => setShowSuccessModal(false)}
+        bookingData={bookingData}
+      />
     </div>
   );
 };

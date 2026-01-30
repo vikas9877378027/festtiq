@@ -62,7 +62,7 @@ const getIconForService = (serviceName) => {
   return MicrophoneStage; // default icon
 };
 
-const API_BASE = "http://localhost:4000/api";
+import { SERVICE_LIST_URL } from "../../../config/apiConfig";
 
 const VenueHighlight = ({ venue }) => {
   const [showSlider, setShowSlider] = useState(false);
@@ -86,7 +86,7 @@ const VenueHighlight = ({ venue }) => {
   const fetchServices = async () => {
     try {
       setServicesLoading(true);
-      const response = await axios.get(`${API_BASE}/service/list`);
+      const response = await axios.get(SERVICE_LIST_URL);
       
       if (response.data?.success && Array.isArray(response.data.services)) {
         // Filter only active services

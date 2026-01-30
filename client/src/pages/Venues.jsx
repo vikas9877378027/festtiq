@@ -597,11 +597,13 @@ import eventFallback from "../assets/venue/image (11).png";
 import { HiAdjustmentsVertical } from "react-icons/hi2";
 
 /* ===================== API ENDPOINT ===================== */
-const API_BASE = "http://localhost:4000/api";
-const PRODUCT_LIST_URL = `${API_BASE}/product/list`;
-const FAVORITES_URL = `${API_BASE}/user/favorites`;
-const TOGGLE_FAVORITE_URL = `${API_BASE}/user/favorites/toggle`;
-console.log("PRODUCT_LIST_URL",PRODUCT_LIST_URL)   
+import {
+  PRODUCT_LIST_URL,
+  FAVORITES_URL,
+  TOGGLE_FAVORITE_URL,
+  getImageUrl,
+} from "../config/apiConfig";
+console.log("PRODUCT_LIST_URL", PRODUCT_LIST_URL);   
 
 /* ===================== Event Types (for filter) ===================== */
 const EVENT_GROUPS = [
@@ -837,6 +839,23 @@ export default function Venues() {
   const [venues, setVenues] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  
+  // Check if user is admin
+  const [isAdmin, setIsAdmin] = useState(false);
+  
+  useEffect(() => {
+    const authUser = localStorage.getItem("auth_user");
+    if (authUser) {
+      try {
+        const user = JSON.parse(authUser);
+        setIsAdmin(user.role === "admin");
+      } catch (e) {
+        console.error("Error parsing auth_user:", e);
+        setIsAdmin(false);
+      }
+    }
+  }, []);
 
   // filters
   const [selectedEventType, setSelectedEventType] = useState("");
@@ -885,17 +904,39 @@ export default function Venues() {
     (async () => {
       try {
         setLoading(true);
+        setError(null);
+        
+        console.log("Fetching venues from:", PRODUCT_LIST_URL);
         const res = await fetch(PRODUCT_LIST_URL);
-        const data = await res.json().catch(() => ({}));
-        if (res.ok && data?.success && Array.isArray(data.products)) {
+        
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        
+        const data = await res.json();
+        console.log("API Response:", data);
+        
+        if (data?.success && Array.isArray(data.products)) {
+          console.log("Total products from API:", data.products.length);
+          
           // Filter to show only active venues (inStock: true)
           const activeProducts = data.products.filter((p) => p.inStock === true);
-          setVenues(activeProducts.map(mapProductToVenue));
+          console.log("Active venues (inStock=true):", activeProducts.length);
+          
+          const mappedVenues = activeProducts.map(mapProductToVenue);
+          setVenues(mappedVenues);
+          
+          if (mappedVenues.length === 0) {
+            setError("No active venues found. Please add some venues from the admin panel.");
+          }
         } else {
           setVenues([]);
+          setError("Invalid API response format");
         }
       } catch (err) {
-        console.error("Error loading venues:", err?.message);
+        console.error("Error loading venues:", err);
+        setError(`Failed to load venues: ${err.message}`);
+        setVenues([]);
       } finally {
         setLoading(false);
       }
@@ -1083,6 +1124,11 @@ export default function Venues() {
     setSelectedHallSizeId("");
   };
 
+  // retry loading venues
+  const retryLoadVenues = () => {
+    window.location.reload();
+  };
+
   return (
     <div className="w-full pt-[150px] px-4 sm:px-6 lg:px-24 py-8 bg-[#f9f9f9] font-[Plus_Jakarta_Sans]">
       {/* Header + Filters */}
@@ -1092,12 +1138,15 @@ export default function Venues() {
         </h2>
 
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full md:w-auto">
-          <button
-            onClick={handleAddVenueClick}
-            className="rounded-lg bg-[#8F24AB] px-4 py-2 text-white shadow hover:bg-[#5E0C7D]"
-          >
-            + Add Venue
-          </button>
+          {/* Only show Add Venue button to admins */}
+          {isAdmin && (
+            <button
+              onClick={handleAddVenueClick}
+              className="rounded-lg bg-[#8F24AB] px-4 py-2 text-white shadow hover:bg-[#5E0C7D]"
+            >
+              + Add Venue
+            </button>
+          )}
 
           <div className="relative flex flex-wrap gap-2 sm:gap-3">
             {/* City dropdown */}
@@ -1262,23 +1311,66 @@ export default function Venues() {
 
       {/* Venue Grid / Empty State */}
       {loading ? (
-        <p className="text-sm text-gray-500">Loading venues…</p>
+        <div className="mt-8 mb-16 flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-white/70 px-6 py-10 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mb-4"></div>
+          <p className="text-sm text-gray-600">Loading venues…</p>
+        </div>
+      ) : error ? (
+        <div className="mt-8 mb-16 flex flex-col items-center justify-center rounded-2xl border border-dashed border-red-200 bg-red-50/70 px-6 py-10 text-center">
+          <div className="text-4xl mb-3">⚠️</div>
+          <p className="text-base font-semibold text-red-800 mb-2">
+            Error Loading Venues
+          </p>
+          <p className="text-sm text-red-600 mb-4 max-w-md">
+            {error}
+          </p>
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={retryLoadVenues}
+              className="px-5 py-2 rounded-lg bg-purple-600 text-white text-sm font-medium hover:bg-purple-700"
+            >
+              Retry
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate("/admin/venues")}
+              className="px-5 py-2 rounded-lg border border-purple-500 text-purple-600 text-sm font-medium hover:bg-purple-50"
+            >
+              Go to Admin Panel
+            </button>
+          </div>
+        </div>
       ) : filteredVenues.length === 0 ? (
         <div className="mt-8 mb-16 flex flex-col items-center justify-center rounded-2xl border border-dashed border-purple-200 bg-white/70 px-6 py-10 text-center">
+          <div className="text-4xl mb-3">🔍</div>
           <p className="text-base font-semibold text-gray-800 mb-1">
-            No venues found for the selected filters.
+            {venues.length === 0 ? "No venues available" : "No venues found for the selected filters"}
           </p>
           <p className="text-xs text-gray-500 mb-4 max-w-md">
-            Try changing locality, event type, budget or hall size to see more
-            options.
+            {venues.length === 0 
+              ? "There are no venues in the database. Please add some venues from the admin panel."
+              : "Try changing locality, event type, budget or hall size to see more options."
+            }
           </p>
-          <button
-            type="button"
-            onClick={clearAllFilters}
-            className="px-5 py-2 rounded-full border border-purple-500 text-purple-600 text-xs font-medium hover:bg-purple-50"
-          >
-            Clear all filters
-          </button>
+          <div className="flex gap-3">
+            {venues.length > 0 && (
+              <button
+                type="button"
+                onClick={clearAllFilters}
+                className="px-5 py-2 rounded-full border border-purple-500 text-purple-600 text-xs font-medium hover:bg-purple-50"
+              >
+                Clear all filters
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => navigate("/admin/venues")}
+              className="px-5 py-2 rounded-lg bg-purple-600 text-white text-xs font-medium hover:bg-purple-700"
+            >
+              Add Venues
+            </button>
+          </div>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">

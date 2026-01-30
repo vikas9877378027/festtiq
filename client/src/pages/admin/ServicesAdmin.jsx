@@ -1,13 +1,13 @@
 // src/pages/admin/ServicesAdmin.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-
-const API_BASE = "http://localhost:4000/api";
-const SERVICE_ADD_URL = `${API_BASE}/service/add`;
-const SERVICE_LIST_URL = `${API_BASE}/service/list`;
-const SERVICE_STATUS_URL = `${API_BASE}/service/status`;
-const SERVICE_UPDATE_URL = `${API_BASE}/service/update`;
-const SERVICE_DELETE_URL = `${API_BASE}/service/delete`;
+import {
+  SERVICE_ADD_URL,
+  SERVICE_LIST_URL,
+  SERVICE_STATUS_URL,
+  SERVICE_UPDATE_URL,
+  SERVICE_DELETE_URL,
+} from "../../config/apiConfig";
 
 const ServicesAdmin = () => {
   // ============= FORM STATE =============

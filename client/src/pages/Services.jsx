@@ -6,9 +6,7 @@ import { toast } from "react-toastify";
 // Service fallback image removed - using API data
 import Question from "../components/Home/Question";
 import { useNavigate } from "react-router-dom";
-
-const API_BASE = "http://localhost:4000/api";
-const SERVICE_LIST_URL = `${API_BASE}/service/list`;
+import { SERVICE_LIST_URL } from "../config/apiConfig";
 
 // Default placeholder if service has no image
 const fallbackImage = "https://via.placeholder.com/400x300?text=Service+Image";

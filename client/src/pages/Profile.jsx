@@ -2,10 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import avatar from '../assets/venue/avatar.jpg';
-
-const API_BASE = "http://localhost:4000/api";
-const USER_IS_AUTH = `${API_BASE}/user/is-auth`;
-const UPDATE_PROFILE = `${API_BASE}/user/update-profile`;
+import { USER_IS_AUTH, UPDATE_PROFILE } from "../config/apiConfig";
 
 const Profile = () => {
   const navigate = useNavigate();
